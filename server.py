@@ -75,4 +75,4 @@ def getSimilarQuery():
 
 
 if  __name__ == "__main__":
-    app.run(host='104.214.176.14', port=8080)
+    app.run(debug=True, port=8080)
