@@ -39,7 +39,7 @@ def textQuery(data):
     text = text['value']
     text_emb = model.encode(text)
     result = db.find_vector(text_emb)
-    
+    return result
 
 UPLOAD_FOLDER = 'uploads/'
 def imageQuery():
