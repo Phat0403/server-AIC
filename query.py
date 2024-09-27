@@ -110,7 +110,7 @@ def imageQuery():
 
 def similarQuery(url_img):
     result = []
-    local_file_path = 'C:/Users/tanph/OneDrive/Desktop/NIDIM/server/uploads'
+    local_file_path = '/home/azureuser/server-AIC/uploads'
     command = f"gsutil -m cp -r {url_img} {local_file_path}"
     exit_code = os.system(command)
     if exit_code == 0:

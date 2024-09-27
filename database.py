@@ -18,10 +18,10 @@ def decode_id(id):
     return [f'L{l:02}_V{v:03}', id_frame]
 
 def getData(video, id):
-    with open('C:/Users/tanph/OneDrive/Desktop/NIDIM/server/media-info-b1/media-info/' + video + '.json', 'r', encoding='utf-8') as file:
+    with open('/home/azureuser/server-AIC/media-info-b1/media-info/' + video + '.json', 'r', encoding='utf-8') as file:
             metadata = json.load(file)
             url = metadata["watch_url"]
-    df = pd.read_csv('C:/Users/tanph/OneDrive/Desktop/NIDIM/server/map-keyframes/'+ video + '.csv')
+    df = pd.read_csv('/home/azureuser/server-AIC/map-keyframes/'+ video + '.csv')
     n , pts_time, fps, frame_idx =df.iloc[int(id)-1]
     return url, pts_time, fps, frame_idx
 ##########################################################################################################################################
