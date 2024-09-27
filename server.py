@@ -72,6 +72,15 @@ def getSimilarQuery():
         }
     )
 
+@app.route("/api/query/ocr", methods=['GET'])
+def getOcrQuery():
+    ocr = request.args.get('ocr')
+    resultQuery = query.ocrQuery(ocr)
+    return jsonify(
+        {
+            "data": resultQuery
+        }
+    )
 
 
 if  __name__ == "__main__":

@@ -4,12 +4,24 @@ import pandas as pd
 import os 
 from qdrant_client import QdrantClient
 from qdrant_client import models
-
+from elasticsearch import Elasticsearch
+import urllib3
 import os
 
 client_qdrant = QdrantClient(host='localhost', port=6333, timeout=60)
 collection_name = 'clip-feature-4'
+##########################################################################################################################################
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
+username = 'elastic'
+password = '-LMpeY1XX13uwH95CuWP' # Dien password vao day
+
+es = Elasticsearch(
+    "https://localhost:9200",
+    basic_auth=(username, password),
+    ca_certs=False,
+    verify_certs=False
+)
 ##########################################################################################################################################
 def decode_id(id):
     id_frame = id%3000
@@ -36,6 +48,54 @@ def find_vector(emb):
     search_result =[hit.id for hit in search_result]
     for hit in search_result:
         video_frame, id_frame = decode_id(hit)
+        url, pts_time, fps, frame_idx = getData(video_frame, id_frame)
+        data = {
+            'video': video_frame, 
+            'id': id_frame,
+            'url': url,
+            'pts_time': pts_time,
+            'frame_idx': frame_idx,
+            'fps': fps}
+        result.append(data)
+    return result
+
+
+def findOcr(ocr):
+    result = []
+    response = es.search(
+        index='aic_ocr',
+        body={
+            "query": {
+                "bool": {
+                    "should": [
+                        {
+                            "match": {
+                                "text": {
+                                    "query": ocr,
+                                    "fuzziness": "AUTO",  
+                                    "operator": "or"  
+                                }
+                            }
+                        }
+                    ],
+                    "minimum_should_match": 1  
+                }
+            },
+            "size": 1000,
+            "sort": [
+                {
+                    "_score": {
+                        "order": "desc"  
+                    }
+                }
+            ]
+        }
+    )
+    search_result = response['hits']['hits']
+    search_result = [result['_source']['frame_id'].split(', ') for result in search_result]
+    for hit in search_result:
+        video_frame = hit[0]
+        id_frame = hit[1]
         url, pts_time, fps, frame_idx = getData(video_frame, id_frame)
         data = {
             'video': video_frame, 
