@@ -14,14 +14,14 @@ collection_name = 'clip-feature-4'
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 username = 'elastic'
-password = '-LMpeY1XX13uwH95CuWP' # Dien password vao day
+password = 'Mn*mMi=L2ceq+oEC4Ovm' # Dien password vao day
 
-#es = Elasticsearch(
- #   "https://localhost:9200",
-  #  basic_auth=(username, password),
-   # ca_certs=False,
-    #verify_certs=False
-#)
+es = Elasticsearch(
+    "https://104.214.176.14:9200",
+    basic_auth=(username, password),
+    ca_certs=False,
+    verify_certs=False
+)
 ##########################################################################################################################################
 def decode_id(id):
     id_frame = id%3000
