@@ -38,6 +38,10 @@ def getData(video, id):
     return url, pts_time, fps, frame_idx
 ##########################################################################################################################################
 def fuzzy_search(query, max_results=1000): 
+    if es.indices.exists(index='aic_ocr'):
+        print('co')
+    else:
+        print('khong')
     response = es.search(
         index='aic_ocr',
         body={
