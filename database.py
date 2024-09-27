@@ -8,16 +8,16 @@ from elasticsearch import Elasticsearch
 import urllib3
 import os
 
-client_qdrant = QdrantClient(host='localhost', port=6333, timeout=60)
+client_qdrant = QdrantClient(host='104.214.176.14', port=6333, timeout=60)
 collection_name = 'clip-feature-4'
 ##########################################################################################################################################
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 username = 'elastic'
-password = '-LMpeY1XX13uwH95CuWP' # Dien password vao day
+password = 'Mn*mMi=L2ceq+oEC4Ovm'#'-LMpeY1XX13uwH95CuWP' # Dien password vao day
 
 es = Elasticsearch(
-    "https://localhost:9200",
+    "https://104.214.176.14:9200",
     basic_auth=(username, password),
     ca_certs=False,
     verify_certs=False
@@ -37,8 +37,39 @@ def getData(video, id):
     n , pts_time, fps, frame_idx =df.iloc[int(id)-1]
     return url, pts_time, fps, frame_idx
 ##########################################################################################################################################
+def fuzzy_search(query, max_results=1000): 
+    response = es.search(
+        index='aic_ocr',
+        body={
+            "query": {
+                "bool": {
+                    "should": [
+                        {
+                            "match": {
+                                "text": {
+                                    "query": query,
+                                    "fuzziness": "AUTO",  
+                                    "operator": "or"  
+                                }
+                            }
+                        }
+                    ],
+                    "minimum_should_match": 1  
+                }
+            },
+            "size": max_results,
+            "sort": [
+                {
+                    "_score": {
+                        "order": "desc"  
+                    }
+                }
+            ]
+        }
+    )
+    return response['hits']['hits']
 
-
+##########################################################################################################################################
 def find_vector(emb):
     result = []
     search_result = client_qdrant.search(
@@ -62,36 +93,7 @@ def find_vector(emb):
 
 def findOcr(ocr):
     result = []
-    response = es.search(
-        index='aic_ocr',
-        body={
-            "query": {
-                "bool": {
-                    "should": [
-                        {
-                            "match": {
-                                "text": {
-                                    "query": ocr,
-                                    "fuzziness": "AUTO",  
-                                    "operator": "or"  
-                                }
-                            }
-                        }
-                    ],
-                    "minimum_should_match": 1  
-                }
-            },
-            "size": 1000,
-            "sort": [
-                {
-                    "_score": {
-                        "order": "desc"  
-                    }
-                }
-            ]
-        }
-    )
-    search_result = response['hits']['hits']
+    search_result = fuzzy_search(ocr)
     search_result = [result['_source']['frame_id'].split(', ') for result in search_result]
     for hit in search_result:
         video_frame = hit[0]

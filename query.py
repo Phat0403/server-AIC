@@ -82,5 +82,7 @@ def similarQuery(url_img):
 
 
 def ocrQuery(ocr):
-    result = db.findOcr(ocr)
+    text = ocr[0]
+    text = text['value']
+    result = db.findOcr(text)
     return result
